@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
@@ -69,8 +70,9 @@ public class GameView extends View { //custom view class
     }
 
     @Override
-    protected void onDraw(Canvas canvas) { //draw views here
+    protected void onDraw(final Canvas canvas) { //draw views here
         super.onDraw(canvas);
+
         canvas.drawBitmap(background,null,rect,null);
         canvas.drawBitmap(leftArrow,0,dHeight-200,null);
         canvas.drawBitmap(rightArrow,dWidth-200,dHeight-200,null);
@@ -80,7 +82,8 @@ public class GameView extends View { //custom view class
        // canvas.drawBitmap(doodles[0],(float)guyX,(float)guyY,null);
         guyY+=velocity+gravity;
         Log.d("Info:","GuyY: " + guyY + "Platform Y: "+(platformY-doodles[0].getHeight()));
-        if (guyY>=platformY-doodles[0].getHeight()&&guyX>=platformX-doodles[0].getWidth()&&guyX<=platformX+platform.getWidth())
+        boolean oneTime=false;
+        if (guyY>=platformY-doodles[0].getHeight()&&guyX>=platformX-doodles[0].getWidth()&&guyX<=platformX+platform.getWidth()&&oneTime==false)
         {
             canvas.drawBitmap(doodles[1],(float)guyX,(float)guyY,null);
             MediaPlayer mp = MediaPlayer.create(getContext(),R.raw.jump);
@@ -88,13 +91,18 @@ public class GameView extends View { //custom view class
             velocity=0;
             velocity-=50;
             platformX=new Random().nextInt(dWidth);
-            platformY=new Random().nextInt(dHeight);
+          //  platformY=new Random().nextInt(dHeight/2)+dHeight/2-200;
+            oneTime=true;
         }
         velocity= velocity + gravity;
         if (guyY>dHeight) //reset game here
         {
-
-
+            final Paint p = new Paint();
+            p.setColor(Color.BLACK);
+            p.setTextSize(50);
+            canvas.drawText("You lost",dWidth/2,dHeight/2,p);
+            Bitmap reset = BitmapFactory.decodeResource(getResources(),R.drawable.reset);
+            canvas.drawBitmap(reset,dWidth/2,dHeight/2,null);
         }
 
     }
@@ -111,6 +119,7 @@ public class GameView extends View { //custom view class
         }
         return true;
     }
+
 }
 
 
