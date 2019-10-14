@@ -3,6 +3,7 @@ package com.example.doodlejump;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,7 +22,7 @@ import android.widget.Button;
 import java.util.Random;
 
 public class GameView extends View { //custom view class
-
+//add platform sizes
 
     Handler handler;
     Runnable runnable;
@@ -37,8 +38,14 @@ public class GameView extends View { //custom view class
     double velocity=0;
     double gravity=2;
     double guyX,guyY;
-    Bitmap platform;
+    Bitmap[] platforms = new Bitmap[4];
     double platformX,platformY;
+    boolean lose=false;
+    int score = 0;
+    int maxScore;
+    Random rand = new Random();
+    int platformnum=rand.nextInt(4);
+    SharedPreferences sp = getContext().getSharedPreferences("maxScore",0);
     public GameView(Context context)
     {
         super(context);
@@ -47,13 +54,26 @@ public class GameView extends View { //custom view class
 
             @Override
             public void run() {
-                invalidate(); //calls onDraw
+                if (!lose)
+                    invalidate(); //calls onDraw
+
+                else
+                {
+                    Intent i = new Intent(getContext(),startGame.class);
+                    ((Activity)getContext()).recreate(); //reopening app
+                   // getContext().startActivity(i);
+                    lose=false;
+                }
             }
         };
+        maxScore = sp.getInt("maxScore",0);
         background= BitmapFactory.decodeResource(getResources(),R.drawable.bg);
         leftArrow=BitmapFactory.decodeResource(getResources(),R.drawable.leftarrow);
         rightArrow=BitmapFactory.decodeResource(getResources(),R.drawable.rightarrow);
-        platform=BitmapFactory.decodeResource(getResources(),R.drawable.platform);
+        platforms[0]=BitmapFactory.decodeResource(getResources(),R.drawable.platform1);
+        platforms[1]=BitmapFactory.decodeResource(getResources(),R.drawable.platform2);
+        platforms[2]=BitmapFactory.decodeResource(getResources(),R.drawable.platform3);
+        platforms[3]=BitmapFactory.decodeResource(getResources(),R.drawable.platform4);
         display = ((Activity)getContext()).getWindowManager().getDefaultDisplay();
         point = new Point();
         display.getSize(point);
@@ -62,7 +82,7 @@ public class GameView extends View { //custom view class
         rect= new Rect(0,0,dWidth,dHeight);
         doodles=new Bitmap[2];
         doodles[0] =  BitmapFactory.decodeResource(getResources(),R.drawable.guy);
-        doodles[1] =  BitmapFactory.decodeResource(getResources(),R.drawable.guy2); //for another image, CHANGE LATER FOR ANIMATION
+        doodles[1] =  BitmapFactory.decodeResource(getResources(),R.drawable.guy2); //jumping anim
         guyX=dWidth/2;
         guyY=dHeight/2;
         platformX=dWidth/2;
@@ -76,23 +96,35 @@ public class GameView extends View { //custom view class
         canvas.drawBitmap(background,null,rect,null);
         canvas.drawBitmap(leftArrow,0,dHeight-200,null);
         canvas.drawBitmap(rightArrow,dWidth-200,dHeight-200,null);
-        canvas.drawBitmap(platform,(float)platformX,(float)platformY,null);
+        canvas.drawBitmap(platforms[platformnum],(float)platformX,(float)platformY,null);
         handler.postDelayed(runnable,tick);
+        final Paint sc = new Paint();
+        sc.setColor(Color.BLACK);
+        sc.setTextSize(50);
+        canvas.drawText("Score: "+score,100,100,sc);
+        final Paint sc2 = new Paint();
+        sc.setColor(Color.BLACK);
+        sc.setTextSize(50);
+        canvas.drawText("Your best: "+maxScore,100,170,sc);
         canvas.drawBitmap(doodles[0],(float)guyX,(float)guyY,null); // animation.....
        // canvas.drawBitmap(doodles[0],(float)guyX,(float)guyY,null);
         guyY+=velocity+gravity;
         Log.d("Info:","GuyY: " + guyY + "Platform Y: "+(platformY-doodles[0].getHeight()));
         boolean oneTime=false;
-        if (guyY>=platformY-doodles[0].getHeight()&&guyX>=platformX-doodles[0].getWidth()&&guyX<=platformX+platform.getWidth()&&oneTime==false)
+        if (guyY>=platformY-doodles[0].getHeight()&&guyX>=platformX-doodles[0].getWidth()&&guyX<=platformX+platforms[platformnum].getWidth()&&oneTime==false)
         {
             canvas.drawBitmap(doodles[1],(float)guyX,(float)guyY,null);
             MediaPlayer mp = MediaPlayer.create(getContext(),R.raw.jump);
             mp.start();
             velocity=0;
             velocity-=50;
-            platformX=new Random().nextInt(dWidth);
+            platformX=new Random().nextInt(dWidth-platforms[platformnum].getWidth()-platforms[platformnum].getWidth())+platforms[platformnum].getWidth();
           //  platformY=new Random().nextInt(dHeight/2)+dHeight/2-200;
             oneTime=true;
+            score+=10;
+            platformnum=rand.nextInt(4);
+            if (maxScore<score) { maxScore=score; sp.edit().putInt("maxScore",maxScore).commit(); //SAVE MAXSCORE ON DEVICE
+            }
         }
         velocity= velocity + gravity;
         if (guyY>dHeight) //reset game here
@@ -103,6 +135,9 @@ public class GameView extends View { //custom view class
             canvas.drawText("You lost",dWidth/2,dHeight/2,p);
             Bitmap reset = BitmapFactory.decodeResource(getResources(),R.drawable.reset);
             canvas.drawBitmap(reset,dWidth/2,dHeight/2,null);
+            score=0;
+            lose=true;
+
         }
 
     }
