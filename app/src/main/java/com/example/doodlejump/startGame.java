@@ -15,4 +15,10 @@ public class startGame extends Activity {
         setContentView(gameView);
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        gameView.bg.stop();
+    }
 }
