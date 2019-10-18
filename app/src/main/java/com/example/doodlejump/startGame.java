@@ -1,7 +1,6 @@
 package com.example.doodlejump;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 
 public class startGame extends Activity {
@@ -20,5 +19,6 @@ public class startGame extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         gameView.bg.stop();
+
     }
 }
