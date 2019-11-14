@@ -121,8 +121,8 @@ public class GameView extends View { //custom view class
         canvas.drawBitmap(leftArrow,0,dHeight-200,null);
         canvas.drawBitmap(rightArrow,dWidth-200,dHeight-200,null);
         canvas.drawBitmap(platforms[platformnum],(float)platformX,(float)platformY,null);
-        canvas.drawLine((float)platformX+platforms[platformnum].getWidth()/2,0,(float)platformX+platforms[platformnum].getWidth()/2,dHeight,new Paint());
-        canvas.drawLine((float)guyX+doodles[0].getWidth()/2,0,(float)guyX+doodles[0].getWidth()/2,dHeight,new Paint());
+       // canvas.drawLine((float)platformX+platforms[platformnum].getWidth()/2,0,(float)platformX+platforms[platformnum].getWidth()/2,dHeight,new Paint());
+     //   canvas.drawLine((float)guyX+doodles[0].getWidth()/2,0,(float)guyX+doodles[0].getWidth()/2,dHeight,new Paint());
         handler.postDelayed(runnable,tick);
         sc.setColor(Color.BLACK);
         sc.setTextSize(50);
