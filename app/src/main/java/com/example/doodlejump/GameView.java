@@ -12,12 +12,15 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.Random;
 
@@ -46,7 +49,9 @@ public class GameView extends View { //custom view class
     SharedPreferences sp = getContext().getSharedPreferences("maxScore",0);
     MediaPlayer[] deathSound = new MediaPlayer[2];
     MediaPlayer bg = MediaPlayer.create(getContext(),R.raw.bg);
-
+    MediaPlayer middle = MediaPlayer.create(getContext(),R.raw.middle);
+    float guyMiddleX;
+    float platformMiddleX;
 
     public GameView(Context context)
     {
@@ -117,6 +122,7 @@ public class GameView extends View { //custom view class
         canvas.drawBitmap(rightArrow,dWidth-200,dHeight-200,null);
         canvas.drawBitmap(platforms[platformnum],(float)platformX,(float)platformY,null);
         canvas.drawLine((float)platformX+platforms[platformnum].getWidth()/2,0,(float)platformX+platforms[platformnum].getWidth()/2,dHeight,new Paint());
+        canvas.drawLine((float)guyX+doodles[0].getWidth()/2,0,(float)guyX+doodles[0].getWidth()/2,dHeight,new Paint());
         handler.postDelayed(runnable,tick);
         sc.setColor(Color.BLACK);
         sc.setTextSize(50);
@@ -131,19 +137,18 @@ public class GameView extends View { //custom view class
             canvas.drawBitmap(doodles[0],(float)guyX,(float)guyY,null); //going up
         //----------------------------------
         guyY+=velocity+gravity; //calculating guy vertical position
+        guyMiddleX=(float)guyX+doodles[0].getWidth()/2; //guy middle
+        platformMiddleX = (float)platformX+platforms[platformnum].getWidth()/2;
 
         if (guyY>=platformY-doodles[0].getHeight()&&guyX>=platformX-doodles[0].getWidth()&&
                 guyY<platformY-doodles[0].getHeight()+60&&guyX<=platformX+platforms[platformnum].getWidth()&&oneTime==false) //if got to platform position and +60 for ondraw callsz
         {
-
-            canvas.drawBitmap(doodles[1],(float)guyX,(float)guyY,null); //animation
-            Log.d("Positions","GuyX: "+(guyX-doodles[0].getWidth()/2)+"PlatformX: " + platformX + "platform middle: " + platformX+platforms[platformnum].getWidth()/2); //delete later
-            if (guyX-doodles[0].getWidth()/2<=(platformX-platforms[platformnum].getWidth()/2)+doodles[0].getWidth()/2&&
-                    guyX-doodles[0].getWidth()/2>=(platformX-platforms[platformnum].getWidth()/2)-doodles[0].getWidth()/2) //if guy hits middle of platform get bonus score
+            if (guyMiddleX>=platformMiddleX-20&&guyMiddleX<platformMiddleX+20)
             {
-                Log.d("Middle","hit middle"); //remove later
+                middle.start();
                 score+=100;
             }
+            canvas.drawBitmap(doodles[1],(float)guyX,(float)guyY,null); //animation
             jump.start();
             velocity=0;
             velocity-=55; //jumping
@@ -181,6 +186,8 @@ public class GameView extends View { //custom view class
         }
         return true;
     }
+
+
 
 }
 

@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
         MediaPlayer mp = MediaPlayer.create(this,R.raw.intro);
         mp.start();
         setContentView(R.layout.activity_main);
+
     }
 
     public void startGame(View view)
