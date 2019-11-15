@@ -24,6 +24,8 @@ import android.widget.TextView;
 
 import java.util.Random;
 
+import static com.example.doodlejump.R.layout.activity_main;
+
 public class GameView extends View { //custom view class
 //add platform sizes
 
@@ -66,10 +68,13 @@ public class GameView extends View { //custom view class
 
                 else
                 {
-                    Intent i = new Intent(getContext(),startGame.class);
-                    ((Activity)getContext()).recreate(); //reopening app
-                   // getContext().startActivity(i);
-                    lose=false;
+                    ((Activity)getContext()).recreate(); //restart app on death
+                   /* Intent i = new Intent(getContext(),MainActivity.class);
+                    ((Activity)getContext()).setContentView(activity_main); //reopening app
+                    getContext().startActivity(i);
+                    bg.stop();
+                    middle.stop();
+                    lose=false;*/ //to go back to menu
                 }
             }
         };
@@ -147,6 +152,8 @@ public class GameView extends View { //custom view class
             {
                 middle.start();
                 score+=100;
+              /*  ShowMessageThread s = new ShowMessageThread(5,canvas);
+                new Thread(s).start();*/
             }
             canvas.drawBitmap(doodles[1],(float)guyX,(float)guyY,null); //animation
             jump.start();
@@ -186,6 +193,27 @@ public class GameView extends View { //custom view class
         }
         return true;
     }
+
+  /* private class ShowMessageThread extends Thread{
+
+        int seconds;
+        Canvas canvas;
+        public ShowMessageThread(int seconds,Canvas canvas)
+        {
+            this.canvas=canvas;
+            this.seconds=seconds;
+        }
+        public void run() {
+
+                handler.post(new Runnable(){
+                    @Override
+                    public void run() {
+                        canvas.drawText("MIDDLE HIT",dWidth/2,dHeight/2,sc);
+                    }
+                });
+
+        }
+    }*/
 
 
 
